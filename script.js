@@ -10,7 +10,73 @@ let numberState = '';
 let operationState = [];
 visor.textContent = '';
 
-backSpaceButton.addEventListener('click', () => {
+window.addEventListener('keydown', e => handleKeyCode(e));
+
+numbersButtons.forEach(button => button.addEventListener('click', e => handleNumberButton(e.target.attributes['data-number'].value)));
+
+operationButtons.forEach(button => button.addEventListener('click', e => handleOperationButton(e.target.attributes['data-operator'].value)));
+
+clearButton.addEventListener('click', () => reset());
+
+resultButton.addEventListener('click', () => handleResultButton());
+
+dotButton.addEventListener('click', () => handleDotButton());
+
+backSpaceButton.addEventListener('click', () => handleBackSpaceButton());
+
+function handleKeyCode(e) {
+  const keycodes = {
+    '48': '0',
+    '49': '1',
+    '50': '2',
+    '51': '3',
+    '52': '4',
+    '53': '5',
+    '54': '6',
+    '55': '7',
+    '56': '8',
+    '57': '9',
+    '8': 'backspace',
+    '13': 'enter',
+    '106': 'multiply',
+    '107': 'add',
+    '109': 'subtract',
+    '110': 'dot',
+    '111': 'divide'
+  }
+  const keycode = e.keyCode;
+  if (keycode in keycodes) {
+    e.preventDefault();
+    switch (keycodes[keycode]) {
+      case 'enter':
+        handleResultButton();
+        break;
+      case 'backspace':
+        handleBackSpaceButton();
+        break;
+      case 'multiply':
+        handleOperationButton('multiply');
+        break;
+      case 'add':
+        handleOperationButton('add');
+        break;
+      case 'subtract':
+        handleOperationButton('subtract');
+        break;
+      case 'divide':
+        handleOperationButton('divide');
+        break;
+      case 'dot':
+        handleDotButton();
+        break;
+      default:
+        handleNumberButton(keycodes[keycode]);
+        break;
+    }
+  }
+}
+
+function handleBackSpaceButton() {
   const visorContent = visor.textContent;
   if (visorContent === '') return;
   // check last entered. if number, delete last digit. if operation, remove that operation
@@ -20,20 +86,18 @@ backSpaceButton.addEventListener('click', () => {
     operationState = operationState.slice(0, operationState.length-1);
   }
   visor.textContent = visorContent.split('').slice(0,visorContent.length-1).join('');
-});
+}
 
-dotButton.addEventListener('click', () => {
+function handleDotButton() {
   //checks if numberState has at least one number and no dot
   if (!numberState) return;
   if (!numberState.match(/[0-9]/g)) return;
   if (numberState.match(/\./g)) return;
   numberState += '.';
   updateDisplay('.');
-});
+}
 
-clearButton.addEventListener('click', () => { reset(); });
-
-resultButton.addEventListener('click', () => {
+function handleResultButton() {
   if (numberState === '' || operationState.length < 2) return;
   operationState.push(Number(numberState)); 
   while(operationState.length > 1) {
@@ -58,7 +122,7 @@ resultButton.addEventListener('click', () => {
   replaceDisplay(finalResult);
   numberState = String(finalResult); 
   operationState = [numberState];
-})
+}
 
 function reset() {
   operationState = [];
@@ -70,20 +134,24 @@ function replaceDisplay(value) {
   visor.textContent = value;
 }
 
-numbersButtons.forEach(button => button.addEventListener('click', e => {
-  const value = e.target.attributes['data-number'].value;
+function handleNumberButton(value) {
   numberState += value;
   updateDisplay(value);
-}));
+}
 
-operationButtons.forEach(button => button.addEventListener('click', e => {
+function handleOperationButton(operationName) {
+  const operations = {
+    'add': '+',
+    'multiply': '×',
+    'divide': '÷',
+    'subtract': '-'
+  }
   if (!numberState) return; 
   operationState.push(Number(numberState)); 
   numberState = ''; 
-  const operationName = e.target.attributes['data-operator'].value;
   operationState.push(operationName);
-  updateDisplay(button.textContent); 
-}));
+  updateDisplay(operations[operationName]); 
+}
 
 
 function updateDisplay(value) {
