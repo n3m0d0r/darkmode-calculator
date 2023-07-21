@@ -4,12 +4,13 @@ const operationButtons = document.querySelectorAll('button[data-operator]');
 const dotButton = document.querySelector('button[data-option="dot"]');
 const clearButton = document.querySelector('button[data-option="clear"]');
 const resultButton = document.querySelector('button[data-submit]');
+const maxDecimals = 3;
 let numberState = '';
 let operationState = [];
 visor.textContent = '';
 
 dotButton.addEventListener('click', () => {
-  //checks if numberstate has at least one number and no dot
+  //checks if numberState has at least one number and no dot
   if (!numberState) return;
   if (!numberState.match(/[0-9]/g)) return;
   if (numberState.match(/\./g)) return;
@@ -19,15 +20,30 @@ dotButton.addEventListener('click', () => {
 
 clearButton.addEventListener('click', () => { reset(); });
 
-resultButton.addEventListener('click', e => {
+resultButton.addEventListener('click', () => {
   if (numberState === '' || operationState.length < 2) return;
   operationState.push(Number(numberState)); 
-  const firstNum = operationState[0];
-  const operator = operationState[1];
-  const secondNum = operationState[2];
-  const result = operate(firstNum, secondNum, operator);
-  replaceDisplay(result);
-  numberState = String(result); 
+  while(operationState.length > 1) {
+    const operation = operationState.splice(0, 3);
+    const firstNum = operation[0];
+    const operator = operation[1];
+    const secondNum = operation[2];
+    const result = operate(firstNum, secondNum, operator);
+    if (result === Infinity) {
+      setTimeout(() => reset(), 1000);
+      replaceDisplay('sorry, i cannot calculate that... :(');
+      operationState = [];
+      numberState = '';
+      return;
+    }
+    operationState.unshift(result);
+  }
+  let finalResult = operationState[0];
+  if (finalResult.toString().length > maxDecimals) { 
+    finalResult = finalResult.toFixed(maxDecimals);
+  }
+  replaceDisplay(finalResult);
+  numberState = String(finalResult); 
   operationState = [];
 })
 
@@ -78,7 +94,6 @@ function divide(n1, n2) {
 }
 
 function operate(n1, n2, operator) {
-  console.log(operationState);
   switch (operator) {
     case 'add':
       return add(n1, n2);
