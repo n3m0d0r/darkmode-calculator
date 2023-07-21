@@ -15,7 +15,7 @@ backSpaceButton.addEventListener('click', () => {
   if (visorContent === '') return;
   // check last entered. if number, delete last digit. if operation, remove that operation
   if (numberState) {
-    numberState = numberState.length > 2 ? numberState.split('').slice(0,numberState.length-1) : '';
+    numberState = numberState.length > 2 ? numberState.split('').slice(0,numberState.length-1).join('') : '';
   } else if (operationState) {
     operationState = operationState.slice(0, operationState.length-1);
   }
@@ -50,7 +50,6 @@ resultButton.addEventListener('click', () => {
       return;
     }
     operationState.unshift(result);
-    numberState = result;
   }
   let finalResult = operationState[0];
   if (finalResult.toString().length > maxDecimals) { 
@@ -58,7 +57,7 @@ resultButton.addEventListener('click', () => {
   }
   replaceDisplay(finalResult);
   numberState = String(finalResult); 
-  operationState = [];
+  operationState = [numberState];
 })
 
 function reset() {
