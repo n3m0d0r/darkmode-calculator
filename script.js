@@ -2,12 +2,25 @@ const visor = document.querySelector('.visor');
 const numbersButtons = document.querySelectorAll('button[data-number]');
 const operationButtons = document.querySelectorAll('button[data-operator]');
 const dotButton = document.querySelector('button[data-option="dot"]');
+const backSpaceButton = document.querySelector('button[data-option="backspace"]');
 const clearButton = document.querySelector('button[data-option="clear"]');
 const resultButton = document.querySelector('button[data-submit]');
 const maxDecimals = 3;
 let numberState = '';
 let operationState = [];
 visor.textContent = '';
+
+backSpaceButton.addEventListener('click', () => {
+  const visorContent = visor.textContent;
+  if (visorContent === '') return;
+  // check last entered. if number, delete last digit. if operation, remove that operation
+  if (numberState) {
+    numberState = numberState.length > 2 ? numberState.split('').slice(0,numberState.length-1) : '';
+  } else if (operationState) {
+    operationState = operationState.slice(0, operationState.length-1);
+  }
+  visor.textContent = visorContent.split('').slice(0,visorContent.length-1).join('');
+});
 
 dotButton.addEventListener('click', () => {
   //checks if numberState has at least one number and no dot
@@ -37,6 +50,7 @@ resultButton.addEventListener('click', () => {
       return;
     }
     operationState.unshift(result);
+    numberState = result;
   }
   let finalResult = operationState[0];
   if (finalResult.toString().length > maxDecimals) { 
