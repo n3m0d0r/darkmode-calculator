@@ -51,7 +51,7 @@ resultButton.addEventListener('click', () => {
     }
     operationState.unshift(result);
   }
-  let finalResult = operationState[0];
+  let finalResult = Number(operationState[0]);
   if (finalResult.toString().length > maxDecimals) { 
     finalResult = finalResult.toFixed(maxDecimals);
   }

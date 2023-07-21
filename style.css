@@ -22,9 +22,12 @@ body {
 
 .visor {
   color: #E8E0F8; 
+  display: flex;
+  align-items: end;
   font-size: 64px;
+  height: 100%;
+  justify-content: end;
   padding: 0 10px;
-  text-align: right;
 }
 
 .pad {
